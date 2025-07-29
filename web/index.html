@@ -34,6 +34,35 @@
         
         <div class="main-content">
             <div id="workspaces-tab" class="tab-content active">
+                <!-- 방 검색 -->
+                <div class="search-section">
+                    <input type="text" id="roomSearch" class="search-input" 
+                           placeholder="방 이름 검색..." onkeyup="searchRooms()" />
+                </div>
+                
+                <!-- 새 방 만들기 버튼 -->
+                <div class="create-room-section">
+                    <button onclick="toggleCreateRoom()" class="create-room-btn">+ 새 방 만들기</button>
+                    
+                    <!-- 새 방 만들기 폼 (숨겨짐) -->
+                    <div id="createRoomForm" class="create-form" style="display: none;">
+                        <h4>새 방 만들기</h4>
+                        <input type="text" id="newRoomName" placeholder="방 이름" />
+                        <input type="text" id="newRoomTopic" placeholder="주제 또는 목표" />
+                        <select id="newRoomTimer">
+                            <option value="25">25분 (기본)</option>
+                            <option value="45">45분</option>
+                            <option value="60">60분</option>
+                            <option value="90">90분</option>
+                            <option value="120">120분</option>
+                        </select>
+                        <div class="form-buttons">
+                            <button onclick="createNewRoom()" class="btn-primary">방 생성</button>
+                            <button onclick="toggleCreateRoom()" class="btn-secondary">취소</button>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="room-list">
                     <h3>📋 방 목록</h3>
                     <div id="roomList">
@@ -61,7 +90,49 @@
             
             <div id="focus-tab" class="tab-content">
                 <h3>🎯 집중 모드</h3>
-                <p>방에 입장하면 집중 도구를 사용할 수 있습니다.</p>
+                
+                <!-- 집중 모드 선택 -->
+                <div class="focus-modes">
+                    <h4>집중 단계 선택</h4>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" onclick="selectFocusMode('deep')">
+                            🔒 Deep Focus<br><span class="mode-desc">완전 몰입, 알림 차단</span>
+                        </button>
+                        <button class="mode-btn" onclick="selectFocusMode('social')">
+                            👥 Social Focus<br><span class="mode-desc">협업 중심, 채팅 허용</span>
+                        </button>
+                        <button class="mode-btn" onclick="selectFocusMode('light')">
+                            💡 Light Focus<br><span class="mode-desc">가벼운 집중, 모든 기능</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 타이머 설정 -->
+                <div class="timer-setup">
+                    <h4>타이머 설정</h4>
+                    <div class="timer-controls">
+                        <input type="text" id="focusGoal" placeholder="집중 목표를 입력하세요" />
+                        <select id="focusTime">
+                            <option value="25">25분 (포모도로)</option>
+                            <option value="45">45분</option>
+                            <option value="60">60분</option>
+                            <option value="90">90분</option>
+                        </select>
+                        <button onclick="startFocusMode()" class="start-focus-btn">집중 시작</button>
+                    </div>
+                    
+                    <!-- 현재 집중 상태 -->
+                    <div id="focusStatus" class="focus-status" style="display: none;">
+                        <div class="status-display">
+                            <span id="focusCurrentGoal">목표: -</span>
+                            <span id="focusTimer">25:00</span>
+                            <button onclick="pauseFocusMode()" class="pause-btn">일시정지</button>
+                            <button onclick="stopFocusMode()" class="stop-btn">종료</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="focus-note">방에 입장하면 모든 집중 도구를 사용할 수 있습니다.</p>
             </div>
             
             <div id="friends-tab" class="tab-content">
@@ -71,7 +142,77 @@
             
             <div id="settings-tab" class="tab-content">
                 <h3>⚙️ 설정</h3>
-                <p>앱 설정 (개발 예정)</p>
+                
+                <!-- 테마 설정 -->
+                <div class="settings-section">
+                    <h4>테마와 인터페이스</h4>
+                    <div class="setting-item">
+                        <label>테마 선택:</label>
+                        <select id="themeSelect" onchange="changeTheme()">
+                            <option value="dark">어둠 모드</option>
+                            <option value="light">밝음 모드</option>
+                            <option value="high-contrast">고대비 모드</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="largeText" onchange="toggleLargeText()">
+                            큰 글씨 사용
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 알림 설정 -->
+                <div class="settings-section">
+                    <h4>알림 및 소리</h4>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="enableNotifications" checked onchange="toggleNotifications()">
+                            알림 받기
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="enableSounds" checked onchange="toggleSounds()">
+                            효과음 재생
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>알림 빈도:</label>
+                        <select id="notificationFreq">
+                            <option value="all">모든 알림</option>
+                            <option value="mentions">멘션만</option>
+                            <option value="none">알림 없음</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 언어 설정 -->
+                <div class="settings-section">
+                    <h4>언어 설정</h4>
+                    <div class="setting-item">
+                        <label>인터페이스 언어:</label>
+                        <select id="languageSelect">
+                            <option value="ko">한국어</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="showEnglishHelp" checked>
+                            한국어 명령어와 함께 영문 도움말 표시
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 고급 설정 -->
+                <div class="settings-section">
+                    <h4>고급 설정</h4>
+                    <div class="setting-item">
+                        <button onclick="resetSettings()" class="btn-secondary">설정 초기화</button>
+                        <button onclick="exportSettings()" class="btn-secondary">설정 내보내기</button>
+                    </div>
+                </div>
             </div>
         </div>
         

@@ -415,3 +415,265 @@ body {
         margin: 10px;
     }
 }
+
+/* 새로운 Workspaces 기능 스타일 */
+.search-section {
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px;
+    background: #333;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    border-radius: 5px;
+    font-family: inherit;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.create-room-section {
+    margin-bottom: 20px;
+}
+
+.create-room-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+}
+
+.create-room-btn:hover {
+    background: #45a049;
+}
+
+.create-form {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    margin-top: 15px;
+}
+
+.create-form h4 {
+    margin-bottom: 15px;
+    color: #4CAF50;
+}
+
+.create-form input, .create-form select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    background: #333;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    border-radius: 5px;
+    font-family: inherit;
+}
+
+.form-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-secondary {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-secondary:hover {
+    background: #777;
+}
+
+/* Focus Mode 스타일 */
+.focus-modes {
+    margin-bottom: 30px;
+}
+
+.mode-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.mode-btn {
+    flex: 1;
+    background: #333;
+    border: 2px solid #555;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.mode-btn:hover {
+    border-color: #4CAF50;
+    background: #404040;
+}
+
+.mode-btn.active {
+    border-color: #4CAF50;
+    background: #2d5a2d;
+}
+
+.mode-desc {
+    font-size: 0.8em;
+    color: #bbb;
+}
+
+.timer-setup {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.timer-controls input, .timer-controls select {
+    background: #333;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: inherit;
+}
+
+.timer-controls input {
+    flex: 2;
+}
+
+.timer-controls select {
+    flex: 1;
+}
+
+.start-focus-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+}
+
+.start-focus-btn:hover {
+    background: #45a049;
+}
+
+.focus-status {
+    background: #1a4a1a;
+    border: 2px solid #4CAF50;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.status-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.status-display span {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.pause-btn, .stop-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.pause-btn {
+    background: #ff9800;
+}
+
+.focus-note {
+    margin-top: 20px;
+    color: #888;
+    font-style: italic;
+}
+
+/* Settings 스타일 */
+.settings-section {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    margin-bottom: 20px;
+}
+
+.settings-section h4 {
+    margin-bottom: 15px;
+    color: #4CAF50;
+}
+
+.setting-item {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.setting-item label {
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.setting-item select {
+    background: #333;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    padding: 8px;
+    border-radius: 5px;
+    font-family: inherit;
+}
+
+.setting-item input[type="checkbox"] {
+    accent-color: #4CAF50;
+}
