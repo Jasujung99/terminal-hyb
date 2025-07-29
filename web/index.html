@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동시접속 (SimulSync)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 로그인 모달 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>동시접속 (SimulSync)</h2>
+            <p>하이브리드 CLI + GUI 협업 환경</p>
+            <input type="text" id="usernameInput" class="modal-input" placeholder="사용자 이름" />
+            <br>
+            <div id="loginError" style="color: #f44336; margin: 10px 0; display: none;"></div>
+            <button onclick="connect()" class="modal-btn">접속하기</button>
+        </div>
+    </div>
+
+    <!-- 메인 앱 - SimulSync 레이아웃 -->
+    <div class="container" id="mainApp" style="display: none;">
+        <div class="header">
+            <h1>동시접속 (SimulSync)</h1>
+        </div>
+        
+        <div class="nav-bar">
+            <div class="nav-item active" onclick="switchTab('workspaces')">Workspaces</div>
+            <div class="nav-item" onclick="switchTab('focus')">Focus Mode</div>
+            <div class="nav-item" onclick="switchTab('friends')">Friends</div>
+            <div class="nav-item" onclick="switchTab('settings')">Settings</div>
+        </div>
+        
+        <div class="main-content">
+            <div id="workspaces-tab" class="tab-content active">
+                <div class="room-list">
+                    <h3>📋 방 목록</h3>
+                    <div id="roomList">
+                        <div class="room-item" onclick="joinRoom('study-room')">
+                            <span class="room-status">●</span>
+                            <span class="room-name">Study Room</span>
+                            <span class="room-users">(0명)</span>
+                            <span class="room-topic">- React 프로젝트</span>
+                        </div>
+                        <div class="room-item" onclick="joinRoom('code-lab')">
+                            <span class="room-status">●</span>
+                            <span class="room-name">Code Lab</span>
+                            <span class="room-users">(0명)</span>
+                            <span class="room-topic">- 알고리즘 스터디</span>
+                        </div>
+                        <div class="room-item" onclick="joinRoom('reading')">
+                            <span class="room-status">●</span>
+                            <span class="room-name">Reading</span>
+                            <span class="room-users">(0명)</span>
+                            <span class="room-topic">- 독서모임</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="focus-tab" class="tab-content">
+                <h3>🎯 집중 모드</h3>
+                <p>방에 입장하면 집중 도구를 사용할 수 있습니다.</p>
+            </div>
+            
+            <div id="friends-tab" class="tab-content">
+                <h3>👥 친구</h3>
+                <p>친구 관리 기능 (개발 예정)</p>
+            </div>
+            
+            <div id="settings-tab" class="tab-content">
+                <h3>⚙️ 설정</h3>
+                <p>앱 설정 (개발 예정)</p>
+            </div>
+        </div>
+        
+        <div class="cli-zone">
+            <div class="cli-header">CLI Zone</div>
+            <div class="cli-input">
+                <span class="cli-prompt">></span>
+                <input type="text" id="mainCliInput" class="cli-command" 
+                       placeholder="join study-room, create-room 새방, help" 
+                       onkeypress="handleMainCliInput(event)" />
+            </div>
+            <div id="mainCliOutput" class="cli-output"></div>
+        </div>
+    </div>
+
+    <!-- 방 내부 - Quiet Co-Work 레이아웃 -->
+    <div class="container room-container" id="roomApp" style="display: none;">
+        <div class="room-header">
+            <button onclick="leaveRoom()" class="back-btn">← 나가기</button>
+            <span id="roomTitle">Study Room</span>
+            <span id="roomUsers">(0명)</span>
+            <div class="timer-section">
+                <span id="timerDisplay">⏱️ --:--</span>
+            </div>
+        </div>
+        
+        <div class="room-main">
+            <div class="participants-panel">
+                <h4>참가자</h4>
+                <div id="participantsList">
+                    <!-- 참가자 목록이 여기에 동적으로 추가됩니다 -->
+                </div>
+            </div>
+            
+            <div class="chat-panel">
+                <div class="goal-section">
+                    <strong>목표:</strong> <span id="roomGoal">설정되지 않음</span>
+                </div>
+                <hr class="separator">
+                <div class="chat-header">💬 채팅:</div>
+                <div id="chatMessages" class="chat-messages">
+                    <!-- 채팅 메시지가 여기에 표시됩니다 -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="메시지를 입력하세요..." 
+                           onkeypress="handleChatInput(event)" />
+                </div>
+            </div>
+        </div>
+        
+        <div class="cli-zone">
+            <div class="cli-input">
+                <span class="cli-prompt">></span>
+                <input type="text" id="roomCliInput" class="cli-command" 
+                       placeholder="focus --goal='컴포넌트 설계' --timer=90, break, help" 
+                       onkeypress="handleRoomCliInput(event)" />
+            </div>
+            <div id="roomCliOutput" class="cli-output"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
