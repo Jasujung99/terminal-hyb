@@ -781,6 +781,33 @@ function handleWebSocketMessage(data) {
         } else {
             addChatMessage(`* ${data.message}`, 'system');
         }
+    } else if (data.type === 'room_list') {
+        // 서버에서 받은 실제 방 목록으로 업데이트
+        const rooms = Object.entries(data.rooms || {}).map(([name, info]) => ({
+            name: name,
+            participants: info.participants || 0,
+            topic: info.topic || '주제 없음'
+        }));
+        updateRoomListDisplay(rooms);
+        addMainCliOutput(`방 목록을 업데이트했습니다. (${rooms.length}개 방)`, 'info');
+    } else if (data.type === 'join_response') {
+        if (data.success) {
+            currentRoom = data.room;
+            addMainCliOutput(`"${data.room}" 방에 참여했습니다.`, 'success');
+            // 방 화면으로 전환
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('roomApp').style.display = 'flex';
+            document.getElementById('roomTitle').textContent = data.room;
+        } else {
+            addMainCliOutput(data.message || '방 참여에 실패했습니다.', 'error');
+        }
+    } else if (data.type === 'create_response') {
+        if (data.success) {
+            addMainCliOutput(`"${data.room}" 방을 생성했습니다.`, 'success');
+            updateRoomList(); // 방 목록 새로고침
+        } else {
+            addMainCliOutput(data.message || '방 생성에 실패했습니다.', 'error');
+        }
     }
 }
 
@@ -998,28 +1025,41 @@ function showMainHelp() {
 
 // 방 관리
 function joinRoom(roomName) {
-    if (!ws) {
-        addMainCliOutput('서버에 연결되지 않았습니다.', 'error');
-        return;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        // 실제 서버에 방 참여 요청
+        ws.send(JSON.stringify({
+            type: 'join',
+            room: roomName,
+            username: username
+        }));
+        addMainCliOutput(`"${roomName}" 방 참여 요청을 보냈습니다...`, 'info');
+    } else {
+        // 데모 모드
+        currentRoom = roomName;
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('roomApp').style.display = 'flex';
+        document.getElementById('roomTitle').textContent = roomName + ' (데모)';
+        
+        // 채팅 영역 초기화
+        document.getElementById('chatMessages').innerHTML = '';
+        addChatMessage(`[데모] ${roomName} 방에 입장했습니다.`, 'system');
+        addChatMessage('[데모] 실제 채팅은 서버 연결 후 가능합니다.', 'system');
+        
+        // 데모용 참가자 목록 업데이트
+        const participantsList = document.getElementById('participantsList');
+        participantsList.innerHTML = `
+            <div class="participant-item">
+                <span class="participant-status">●</span>
+                <span>${username} (나)</span>
+            </div>
+            <div class="participant-item">
+                <span class="participant-status">●</span>
+                <span>Demo User</span>
+            </div>
+        `;
+        
+        addMainCliOutput(`[데모] ${roomName} 방에 입장했습니다.`, 'success');
     }
-    
-    currentRoom = roomName;
-    ws.send(JSON.stringify({
-        type: 'join',
-        room: roomName,
-        username: username
-    }));
-    
-    // UI를 방 화면으로 전환
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('roomApp').style.display = 'flex';
-    document.getElementById('roomTitle').textContent = roomName;
-    
-    // 채팅 영역 초기화
-    document.getElementById('chatMessages').innerHTML = '';
-    addChatMessage(`${roomName} 방에 입장했습니다.`, 'system');
-    
-    addMainCliOutput(`${roomName} 방에 입장했습니다.`, 'success');
 }
 
 function leaveRoom() {
@@ -1052,8 +1092,46 @@ function listRooms() {
 }
 
 function updateRoomList() {
-    // 실제로는 서버에서 방 목록을 가져와야 합니다
-    // 지금은 정적 목록을 유지합니다
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        // 실제 서버에서 방 목록 요청
+        ws.send(JSON.stringify({
+            type: 'get_rooms'
+        }));
+    } else {
+        // 데모 모드에서는 정적 목록 표시
+        updateRoomListDisplay([
+            { name: 'study-room', participants: 0, topic: 'React 프로젝트' },
+            { name: 'code-lab', participants: 0, topic: '알고리즘 스터디' },
+            { name: 'reading', participants: 0, topic: '독서모임' }
+        ]);
+    }
+}
+
+function updateRoomListDisplay(rooms) {
+    const roomListDiv = document.getElementById('roomList');
+    if (!roomListDiv) return;
+    
+    roomListDiv.innerHTML = '';
+    
+    if (rooms.length === 0) {
+        roomListDiv.innerHTML = '<div class="no-rooms">현재 생성된 방이 없습니다.</div>';
+        return;
+    }
+    
+    rooms.forEach(room => {
+        const roomItem = document.createElement('div');
+        roomItem.className = 'room-item';
+        roomItem.onclick = () => joinRoom(room.name);
+        
+        roomItem.innerHTML = `
+            <span class="room-status">●</span>
+            <span class="room-name">${room.name}</span>
+            <span class="room-users">(${room.participants}명)</span>
+            <span class="room-topic">- ${room.topic || '주제 없음'}</span>
+        `;
+        
+        roomListDiv.appendChild(roomItem);
+    });
 }
 
 // 방 내부 CLI 처리
