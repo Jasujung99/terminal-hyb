@@ -63,8 +63,8 @@ class SimulSyncCLI:
         """메인 메뉴 출력"""
         menu = f"""
 {Colors.MAGENTA}{Colors.BOLD}┌─ 메인 메뉴 ─────────────────────────────────────────────────────────────┐{Colors.RESET}
-{Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}참여 <방이름>{Colors.RESET}        - 방에 참여
-{Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}생성 <방이름>{Colors.RESET}        - 새 방 생성  
+{Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}참여 "방이름"{Colors.RESET}        - 방에 참여
+{Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}생성 "방이름"{Colors.RESET}        - 새 방 생성  
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}방목록{Colors.RESET}              - 방 목록 보기
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}상태{Colors.RESET}                - 현재 상태 확인
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}도움말{Colors.RESET}              - 도움말
@@ -99,11 +99,11 @@ class SimulSyncCLI:
 {Colors.BLUE}{Colors.BOLD}┌─ 방 명령어 ─────────────────────────────────────────────────────────────┐{Colors.RESET}
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}집중 --목표="목표" --시간=90{Colors.RESET}  - 집중 모드 시작
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}휴식{Colors.RESET}                          - 휴식/집중 모드 종료
-{Colors.BLUE}│{Colors.RESET} {Colors.GREEN}목표 <목표>{Colors.RESET}                   - 목표 설정
+{Colors.BLUE}│{Colors.RESET} {Colors.GREEN}목표 "목표"{Colors.RESET}                   - 목표 설정
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}상태{Colors.RESET}                          - 집중 상태 확인
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}참가자{Colors.RESET}                        - 참가자 목록
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}나가기{Colors.RESET}                        - 방 나가기
-{Colors.BLUE}│{Colors.RESET} {Colors.GREEN}<메시지>{Colors.RESET}                      - 채팅 보내기
+{Colors.BLUE}│{Colors.RESET} {Colors.GREEN}"메시지"{Colors.RESET}                      - 채팅 보내기
 {Colors.BLUE}└─────────────────────────────────────────────────────────────────────────┘{Colors.RESET}
 """
         print(room_commands)
@@ -230,6 +230,20 @@ class SimulSyncCLI:
             except json.JSONDecodeError:
                 self.add_chat_message(f"잘못된 메시지 형식: {message}", "system")
                 
+    def validate_room_name(self, room_name: str) -> bool:
+        """방 이름 검증"""
+        # 방 목록에서 해당 방이 존재하는지 확인
+        # 현재는 간단한 검증만 수행 (실제로는 서버에서 방 목록을 받아와야 함)
+        if not room_name or not room_name.strip():
+            return False
+        
+        # 방 이름에 특수문자가 포함되어 있으면 검증 실패
+        invalid_chars = ['<', '>', '~', '!', '@', '#', '$', '%', '^', '&', '*']
+        if any(char in room_name for char in invalid_chars):
+            return False
+            
+        return True
+                
     async def process_command(self, command: str):
         """명령어 처리"""
         if not command:
@@ -242,16 +256,23 @@ class SimulSyncCLI:
             if command.startswith("참여 "):
                 room_name = command[3:].strip()
                 if room_name:
-                    await self.join_room(room_name)
+                    # 올바른 방 이름 검증
+                    if self.validate_room_name(room_name):
+                        await self.join_room(room_name)
+                    else:
+                        print(f"{Colors.RED}해당 방은 존재하지 않습니다: {room_name}{Colors.RESET}")
+                        print(f"{Colors.DIM}(Room does not exist: {room_name}){Colors.RESET}")
                 else:
-                    print(f"{Colors.RED}사용법: 참여 <방이름>{Colors.RESET}")
+                    print(f"{Colors.RED}사용법: 참여 \"방이름\"{Colors.RESET}")
+                    print(f"{Colors.DIM}(Usage: 참여 \"room-name\"){Colors.RESET}")
                     
             elif command.startswith("생성 "):
                 room_name = command[3:].strip()
                 if room_name:
                     await self.create_room(room_name)
                 else:
-                    print(f"{Colors.RED}사용법: 생성 <방이름>{Colors.RESET}")
+                    print(f"{Colors.RED}사용법: 생성 \"방이름\"{Colors.RESET}")
+                    print(f"{Colors.DIM}(Usage: 생성 \"room-name\"){Colors.RESET}")
                 
             elif command == "방목록":
                 await self.list_rooms()
@@ -279,7 +300,8 @@ class SimulSyncCLI:
                 if goal:
                     self.set_goal(goal)
                 else:
-                    print(f"{Colors.RED}사용법: 목표 <목표 설명>{Colors.RESET}")
+                    print(f"{Colors.RED}사용법: 목표 \"목표 설명\"{Colors.RESET}")
+                    print(f"{Colors.DIM}(Usage: 목표 \"goal description\"){Colors.RESET}")
                     
             elif command == "도움말":
                 self.show_help()
@@ -296,7 +318,8 @@ class SimulSyncCLI:
             if self.current_room:
                 await self.send_message(command)
             else:
-                print(f"{Colors.RED}방에 참여한 후 채팅할 수 있습니다. '참여 <방이름>'{Colors.RESET}")
+                print(f"{Colors.RED}방에 참여한 후 채팅할 수 있습니다. '참여 \"방이름\"'{Colors.RESET}")
+                print(f"{Colors.DIM}(Join a room first to chat. '참여 \"room-name\"') ){Colors.RESET}")
                 
         return True
         
@@ -435,7 +458,7 @@ class SimulSyncCLI:
 {Colors.GREEN}집중 모드 명령어:{Colors.RESET}
   집중 --목표="목표" --시간=90     - 집중 모드 시작 (기본 25분)
   휴식                            - 휴식/집중 모드 종료
-  목표 <목표 설명>                - 목표만 설정
+  목표 "목표 설명"                - 목표만 설정
   상태                            - 집중 상태 확인
 
 {Colors.GREEN}방 관리 명령어:{Colors.RESET}
@@ -443,12 +466,12 @@ class SimulSyncCLI:
   나가기        - 방 나가기
 
 {Colors.GREEN}채팅:{Colors.RESET}
-  <메시지>      - 채팅 메시지 보내기
+  "메시지"      - 채팅 메시지 보내기
 
 {Colors.BLUE}집중 모드 사용 예시:{Colors.RESET}
   집중 --목표="React 공부" --시간=60
   집중 --목표="논문 작성"           (기본 25분)
-  목표 새로운 목표 설정
+  목표 "새로운 목표 설정"
   상태                             (진행 상황 확인)
   휴식                             (휴식)
 
@@ -459,8 +482,8 @@ class SimulSyncCLI:
 {Colors.YELLOW}{Colors.BOLD}메인 도움말{Colors.RESET}
 
 {Colors.GREEN}메인 명령어:{Colors.RESET}
-  참여 <방이름>    - 방에 참여
-  생성 <방이름>    - 새 방 생성
+  참여 "방이름"    - 방에 참여
+  생성 "방이름"    - 새 방 생성
   방목록           - 방 목록 보기
   상태             - 시스템 상태 확인
   도움말           - 이 도움말
@@ -468,8 +491,8 @@ class SimulSyncCLI:
 
 {Colors.BLUE}사용 예시:{Colors.RESET}
   방목록                    (방 목록 확인)
-  참여 스터디룸             (방 참여)
-  생성 내방                 (새 방 생성)
+  참여 "스터디룸"           (방 참여)
+  생성 "내방"               (새 방 생성)
 
 {Colors.BLUE}팁:{Colors.RESET}
   - 명령어는 한국어로 입력하세요
