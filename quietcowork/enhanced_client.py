@@ -98,6 +98,7 @@ class SimulSyncCLI:
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}목표 "목표"{Colors.RESET}                   - 목표 설정
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}상태{Colors.RESET}                          - 집중 상태 확인
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}참가자{Colors.RESET}                        - 참가자 목록
+{Colors.BLUE}│{Colors.RESET} {Colors.GREEN}방목록{Colors.RESET}                        - 다른 방 목록 보기
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}나가기{Colors.RESET}                        - 방 나가기
 {Colors.BLUE}│{Colors.RESET} {Colors.GREEN}"메시지"{Colors.RESET}                      - 채팅 보내기
 {Colors.BLUE}└─────────────────────────────────────────────────────────────────────────┘{Colors.RESET}
@@ -252,7 +253,7 @@ class SimulSyncCLI:
             return
             
         # 한국어 명령어 처리
-        if command in ["참여", "상태", "도움말", "종료", "참가자", "나가기", "휴식"] or \
+        if command in ["참여", "상태", "도움말", "종료", "참가자", "방목록", "나가기", "휴식"] or \
            command.startswith(("참여 ", "생성 ", "목표 ", "집중 ")):
             
             if command.startswith("참여 "):
@@ -284,6 +285,9 @@ class SimulSyncCLI:
                 
             elif command == "참가자":
                 self.show_participants()
+                
+            elif command == "방목록":
+                await self.list_rooms()
                 
             elif command == "나가기":
                 await self.leave_room()
