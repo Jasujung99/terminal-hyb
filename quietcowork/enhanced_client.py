@@ -65,7 +65,6 @@ class SimulSyncCLI:
 {Colors.MAGENTA}{Colors.BOLD}┌─ 메인 메뉴 ─────────────────────────────────────────────────────────────┐{Colors.RESET}
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}참여 "방이름"{Colors.RESET}        - 방에 참여
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}생성 "방이름"{Colors.RESET}        - 새 방 생성  
-{Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}방목록{Colors.RESET}              - 방 목록 보기
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}상태{Colors.RESET}                - 현재 상태 확인
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}도움말{Colors.RESET}              - 도움말
 {Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}종료{Colors.RESET}                - 종료
@@ -78,15 +77,12 @@ class SimulSyncCLI:
         if not self.current_room:
             return
             
-        interface = f"""
-{Colors.CYAN}{Colors.BOLD}┌─ {self.current_room} 방 ─────────────────────────────────────────────────┐{Colors.RESET}
+        interface = f"{Colors.CYAN}{Colors.BOLD}┌─ {self.current_room} 방 ─────────────────────────────────────────────────┐{Colors.RESET}
 {Colors.CYAN}│{Colors.RESET} 참가자 ({len(self.participants)}명): {Colors.GREEN}{', '.join(self.participants)}{Colors.RESET}
 {Colors.CYAN}└─────────────────────────────────────────────────────────────────────────┘{Colors.RESET}
 
-{Colors.YELLOW}{Colors.BOLD}┌─ 최근 채팅 ─────────────────────────────────────────────────────────────┐{Colors.RESET}
-"""
+{Colors.YELLOW}{Colors.BOLD}┌─ 최근 채팅 ─────────────────────────────────────────────────────────────┐{Colors.RESET}"
         print(interface)
-        
         # 최근 채팅 5개만 표시
         recent_chats = self.chat_history[-5:] if len(self.chat_history) > 5 else self.chat_history
         for chat in recent_chats:
@@ -110,9 +106,7 @@ class SimulSyncCLI:
         
     def print_rooms_list(self):
         """방 목록 출력"""
-        rooms_display = f"""
-{Colors.MAGENTA}{Colors.BOLD}┌─ 방 목록 ───────────────────────────────────────────────────────────────┐{Colors.RESET}
-"""
+        rooms_display = f"{Colors.MAGENTA}{Colors.BOLD}┌─ 방 목록 ───────────────────────────────────────────────────────────────┐{Colors.RESET}"
         print(rooms_display)
         if not self.rooms_list:
             print(f"{Colors.MAGENTA}│{Colors.RESET} {Colors.DIM}사용 가능한 방이 없습니다.{Colors.RESET}")
@@ -258,7 +252,7 @@ class SimulSyncCLI:
             return
             
         # 한국어 명령어 처리
-        if command in ["참여", "방목록", "상태", "도움말", "종료", "참가자", "나가기", "휴식"] or \
+        if command in ["참여", "상태", "도움말", "종료", "참가자", "나가기", "휴식"] or \
            command.startswith(("참여 ", "생성 ", "목표 ", "집중 ")):
             
             if command.startswith("참여 "):
@@ -281,9 +275,6 @@ class SimulSyncCLI:
                 else:
                     print(f"{Colors.RED}사용법: 생성 \"방이름\"{Colors.RESET}")
                     print(f"{Colors.DIM}(Usage: 생성 \"room-name\"){Colors.RESET}")
-                
-            elif command == "방목록":
-                await self.list_rooms()
                 
             elif command == "상태":
                 if self.current_room:
@@ -492,19 +483,18 @@ class SimulSyncCLI:
 {Colors.GREEN}메인 명령어:{Colors.RESET}
   참여 "방이름"    - 방에 참여
   생성 "방이름"    - 새 방 생성
-  방목록           - 방 목록 보기
   상태             - 시스템 상태 확인
   도움말           - 이 도움말
   종료             - 프로그램 종료
 
 {Colors.BLUE}사용 예시:{Colors.RESET}
-  방목록                    (방 목록 확인)
   참여 "스터디룸"           (방 참여)
   생성 "내방"               (새 방 생성)
 
 {Colors.BLUE}팁:{Colors.RESET}
   - 명령어는 한국어로 입력하세요
   - 방 이름에는 공백을 사용할 수 있습니다
+  - 방 목록은 메인 화면에 자동으로 표시됩니다
   - Ctrl+C로 언제든 종료할 수 있습니다
 
 {Colors.DIM}※ 기존 영문 명령어(/join, /create 등)도 계속 사용 가능합니다.{Colors.RESET}
