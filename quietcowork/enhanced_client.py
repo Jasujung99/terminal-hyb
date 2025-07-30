@@ -222,7 +222,6 @@ class SimulSyncCLI:
                             print(f"{Colors.YELLOW}팁: '생성 <방이름>'으로 새 방을 만들어보세요!{Colors.RESET}")
                         else:
                             print(f"{Colors.YELLOW}팁: '참여 <방이름>'으로 방에 입장하거나 '도움말'로 사용법을 확인하세요.{Colors.RESET}")
-                       print()  #빈 줄 추가
                     
                 elif data.get("type") == "participants":
                     # 서버에서 정확한 참가자 목록 받기
