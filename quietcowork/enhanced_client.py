@@ -114,7 +114,6 @@ class SimulSyncCLI:
 {Colors.MAGENTA}{Colors.BOLD}┌─ 방 목록 ───────────────────────────────────────────────────────────────┐{Colors.RESET}
 """
         print(rooms_display)
-        
         if not self.rooms_list:
             print(f"{Colors.MAGENTA}│{Colors.RESET} {Colors.DIM}사용 가능한 방이 없습니다.{Colors.RESET}")
             print(f"{Colors.MAGENTA}│{Colors.RESET} {Colors.GREEN}/create <방이름>{Colors.RESET}으로 새 방을 만드세요!")
@@ -176,6 +175,8 @@ class SimulSyncCLI:
         if self.current_room:
             self.print_room_interface()
         else:
+            # 메인 화면에서는 방 목록을 먼저 표시
+            self.print_rooms_list()
             self.print_main_menu()
             
     async def user_input(self, prompt: str = f"{Colors.GREEN}> {Colors.RESET}") -> str:
@@ -214,6 +215,14 @@ class SimulSyncCLI:
                         
                 elif data.get("type") == "room_list":
                     self.rooms_list = data.get("rooms", {})
+                    # 메인 화면일 때만 안내 메시지 출력 (방 목록은 update_display에서 자동 표시)
+                    if not self.current_room:
+                        print(f"\n{Colors.GREEN}✓ 방 목록이 업데이트되었습니다!{Colors.RESET}")
+                        if not self.rooms_list:
+                            print(f"{Colors.YELLOW}팁: '생성 <방이름>'으로 새 방을 만들어보세요!{Colors.RESET}")
+                        else:
+                            print(f"{Colors.YELLOW}팁: '참여 <방이름>'으로 방에 입장하거나 '도움말'로 사용법을 확인하세요.{Colors.RESET}")
+                       print()  #빈 줄 추가
                     
                 elif data.get("type") == "participants":
                     # 서버에서 정확한 참가자 목록 받기
@@ -575,7 +584,11 @@ class SimulSyncCLI:
                 
                 # 초기 화면 표시
                 self.update_display()
-                print(f"{Colors.GREEN}서버에 연결되었습니다! '도움말'로 사용법을 확인하세요.{Colors.RESET}")
+                print(f"{Colors.GREEN}서버에 연결되었습니다!{Colors.RESET}")
+                
+                # 연결 즉시 방 목록 요청
+                await ws.send(json.dumps({"type": "get_rooms"}))
+                print(f"{Colors.CYAN}현재 방 목록을 가져오는 중...{Colors.RESET}")
                 
                 # 수신 태스크 시작
                 recv_task = asyncio.create_task(self.receiver())
